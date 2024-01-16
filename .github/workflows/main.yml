@@ -79,8 +79,8 @@ jobs:
 
       - name: Upload to TestFlight
         env:
-          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APPLE_USER_NAME: ${{ secrets.APPLE_USER_NAME }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
-          xcrun altool --validate-app -f thibolt.ipa -t ios --apiKey $APPSTORE_API_KEY_ID --apiIssuer $APPSTORE_ISSUER_ID
-          xcrun altool --upload-app -f thibolt.ipa -t ios --apiKey $APPSTORE_API_KEY_ID --apiIssuer $APPSTORE_ISSUER_ID
+          xcrun altool --validate-app -f thibolt.ipa -t ios --username $APPLE_USER_NAME --password $APPLE_APP_SPECIFIC_PASSWORD
+          xcrun altool --upload-app -f thibolt.ipa -t ios --username $APPLE_USER_NAME --password $APPLE_APP_SPECIFIC_PASSWORD
