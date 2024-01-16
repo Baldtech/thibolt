@@ -1,6 +1,6 @@
 {
-    "name": "workout_app",
-    "short_name": "workout_app",
+    "name": "thibolt",
+    "short_name": "thibolt",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

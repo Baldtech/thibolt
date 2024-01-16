@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:workout_app/pages/home.dart';
+import 'package:thibolt/common/app_bar.dart';
+import 'package:thibolt/common_libs.dart';
+import 'package:thibolt/pages/details.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,9 +13,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // theme: ThemeData(fontFamily: 'Poppins'),
-      home: HomePage(),
+      debugShowCheckedModeBanner: true,
+      theme: lightTheme,
+      home: Scaffold(
+        appBar: const NavBar(),
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/background.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: const DetailsPage(),
+        ),
+      ),
     );
   }
 }
