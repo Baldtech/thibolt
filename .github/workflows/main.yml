@@ -50,7 +50,7 @@ jobs:
           commitChange: false
 
       - name: Building IPA
-        run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist  --export-method development
+        run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist
 
       - name: collect ipa artifacts
         uses: actions/upload-artifact@v4
