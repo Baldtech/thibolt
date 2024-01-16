@@ -82,5 +82,4 @@ jobs:
           APPLE_USER_NAME: ${{ secrets.APPLE_USER_NAME }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
-          xcrun altool --validate-app -f thibolt.ipa -t ios --username $APPLE_USER_NAME --password $APPLE_APP_SPECIFIC_PASSWORD
           xcrun altool --upload-app -f thibolt.ipa -t ios --username $APPLE_USER_NAME --password $APPLE_APP_SPECIFIC_PASSWORD
