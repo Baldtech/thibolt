@@ -85,8 +85,8 @@ jobs:
       #     xcrun altool --upload-app -f thibolt.ipa -t ios --username $APPLE_ACCOUNT_ID --password $APPLE_APP_SPECIFIC_PASSWORD
 
       - name: Upload artifact to Firebase App Distribution
-        uses: hasretsariyer/firebase-app-distribution-github-action@v1
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          app_id: ${{secrets.FIREBASE_IOS_APP_ID}}
-          firebase_token: ${{secrets.FIREBASE_TOKEN}}
-          app_file: thibolt.ipa
+          appId: ${{secrets.FIREBASE_IOS_APP_ID}}
+          serviceCredentialsFileContent: ${{secrets.CREDENTIAL_FILE_CONTENT}}
+          file: thibolt.ipa
