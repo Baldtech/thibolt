@@ -2,14 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>generateAppStoreInformation</key>
-	<false/>
-	<key>manageAppVersionAndBuildNumber</key>
-	<true/>
 	<key>method</key>
 	<string>app-store</string>
+	<key>provisioningProfiles</key>
+    <dict>
+        <key>be.baldtech.thibolt</key>
+        <string>be.baldtech.thibolt.distribution</string>
+    </dict>
+	<key>signingCertificate</key>
+    <string>Apple Distribution: Thibault Dany K Ceulemans (Y7DL4DV47Z)</string>
 	<key>signingStyle</key>
-	<string>automatic</string>
+	<string>manual</string>
 	<key>stripSwiftSymbols</key>
 	<true/>
 	<key>teamID</key>
