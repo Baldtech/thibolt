@@ -53,9 +53,34 @@ jobs:
 
       - run: flutter build ipa
 
+      - name: collect ipa artifacts
+        uses: actions/upload-artifact@v2
+        with:
+         name: release-ipa
+         path: build/ios/ipa/*.ipa
+
       # Important! Cleanup: remove the certificate and provisioning profile from the runner!
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+  
+  release:
+    name: Release ipa to TestFlight
+    needs: [ build ]
+    runs-on: macos-latest
+    steps:
+    
+    - uses: actions/checkout@v4
+    - name: Get release-ipa from artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: release-ipa
+
+    - name: Upload to TestFlight
+      env:
+        API_KEY_BASE64: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+      run: |
+        xcrun altool --validate-app -f thibolt.ipa -t ios --apiKey ${{ secrets.APPSTORE_API_KEY_ID }} --apiIssuer ${{ secrets.APPSTORE_ISSUER_ID }}
+        xcrun altool --upload-app -f thibolt.ipa -t ios --apiKey ${{ secrets.APPSTORE_API_KEY_ID }} --apiIssuer ${{ secrets.APPSTORE_ISSUER_ID }}
