@@ -58,7 +58,6 @@ jobs:
          name: release-ipa
          path: build/ios/ipa/*.ipa
 
-      # Important! Cleanup: remove the certificate and provisioning profile from the runner!
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
         run: |
@@ -69,17 +68,19 @@ jobs:
     name: Release ipa to TestFlight
     needs: [ build ]
     runs-on: macos-latest
-    steps:
-    
-    - uses: actions/checkout@v4
-    - name: Get release-ipa from artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: release-ipa
 
-    - name: Upload to TestFlight
-      env:
-        API_KEY_BASE64: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-      run: |
-        xcrun altool --validate-app -f thibolt.ipa -t ios --apiKey ${{ secrets.APPSTORE_API_KEY_ID }} --apiIssuer ${{ secrets.APPSTORE_ISSUER_ID }}
-        xcrun altool --upload-app -f thibolt.ipa -t ios --apiKey ${{ secrets.APPSTORE_API_KEY_ID }} --apiIssuer ${{ secrets.APPSTORE_ISSUER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get release-ipa from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-ipa
+
+      - name: Upload to TestFlight
+        env:
+          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          xcrun altool --validate-app -f thibolt.ipa -t ios --apiKey $APPSTORE_API_KEY_ID --apiIssuer $APPSTORE_ISSUER_ID
+          xcrun altool --upload-app -f thibolt.ipa -t ios --apiKey $APPSTORE_API_KEY_ID --apiIssuer $APPSTORE_ISSUER_ID
