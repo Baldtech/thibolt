@@ -41,8 +41,6 @@ jobs:
         with:
           channel: 'stable'
           
-      - run: flutter --version
-
       - name: Update package version
         uses: fjogeleit/yaml-update-action@main
         with:
@@ -51,7 +49,8 @@ jobs:
           value: 1.0.0+${{github.run_number}}
           commitChange: false
 
-      - run: flutter build ipa --export-method development
+      - name: Building IPA
+        run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist  --export-method development
 
       - name: collect ipa artifacts
         uses: actions/upload-artifact@v4
