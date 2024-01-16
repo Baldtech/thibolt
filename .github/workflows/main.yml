@@ -77,9 +77,16 @@ jobs:
         with:
           name: release-ipa
 
-      - name: Upload to TestFlight
-        env:
-          APPLE_ACCOUNT_ID: ${{ secrets.APPLE_ACCOUNT_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        run: |
-          xcrun altool --upload-app -f thibolt.ipa -t ios --username $APPLE_ACCOUNT_ID --password $APPLE_APP_SPECIFIC_PASSWORD
+      # - name: Upload to TestFlight
+      #   env:
+      #     APPLE_ACCOUNT_ID: ${{ secrets.APPLE_ACCOUNT_ID }}
+      #     APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      #   run: |
+      #     xcrun altool --upload-app -f thibolt.ipa -t ios --username $APPLE_ACCOUNT_ID --password $APPLE_APP_SPECIFIC_PASSWORD
+
+      - name: Upload artifact to Firebase App Distribution
+        uses: hasretsariyer/firebase-app-distribution-github-action@v1
+        with:
+          app_id: ${{secrets.FIREBASE_IOS_APP_ID}}
+          firebase_token: ${{secrets.FIREBASE_TOKEN}}
+          app_file: thibolt.ipa
