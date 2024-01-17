@@ -107,6 +107,13 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "be.baldtech.thibolt.adhoc"
+          replace: "be.baldtech.thibolt.distribution"
+          include: "**project.pbxproj"
           
       - name: Update package version
         uses: fjogeleit/yaml-update-action@main
