@@ -2,29 +2,54 @@ import 'package:thibolt/common_libs.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:thibolt/models/step.dart';
+import 'package:thibolt/models/workout.dart';
 
 class DetailsPage extends StatefulWidget {
-  const DetailsPage({Key? key}) : super(key: key);
+  const DetailsPage({Key? key, required this.workout}) : super(key: key);
+
+  final Workout workout;
 
   @override
   State<DetailsPage> createState() => _DetailsPageState();
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  final _workoutTitle = 'Workout of the day';
-  final _duration = 10;
+  var _duration = 0;
   final CountDownController _controller = CountDownController();
 
   List<StepModel> steps = [];
+  List<StepModel> _nextSteps = [];
+  int _currentStepIndex = 0;
+  String _actionText = 'Start workout';
+  bool _flag = false;
+  String _titleText = "";
 
   void _getInitialInfo() {
-    steps = StepModel.getSteps();
+    steps = StepModel.getStepsByWorkoutId(widget.workout.id);
+    _nextSteps = steps.sublist(_currentStepIndex + 1);
+    _duration = steps[0].duration;
+    _titleText = steps[_currentStepIndex].name;
   }
 
   @override
   Widget build(BuildContext context) {
     _getInitialInfo();
 
+    return Scaffold(
+      appBar: const NavBar(),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/background.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _pageContent(context),
+      ),
+    );
+  }
+
+  Container _pageContent(BuildContext context) {
     return Container(
       height: double.infinity,
       child: Column(
@@ -41,7 +66,7 @@ class _DetailsPageState extends State<DetailsPage> {
               ],
             ),
           ),
-          Align(alignment: Alignment.bottomCenter, child: _nextSteps())
+          Align(alignment: Alignment.bottomCenter, child: _nextStepsWidget())
         ],
       ),
     );
@@ -51,8 +76,8 @@ class _DetailsPageState extends State<DetailsPage> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: BaseCard(
-        title: _workoutTitle,
-        subTitle: 'Duration: 1m:5s',
+        title: widget.workout.name,
+        subTitle: Utils.formatTime(widget.workout.duration),
         icon: const Image(
           image: AssetImage('assets/icons/illu_top.png'),
         ),
@@ -66,7 +91,7 @@ class _DetailsPageState extends State<DetailsPage> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: Text(
-            'Monkey arm swings',
+            _titleText,
             style: Theme.of(context)
                 .textTheme
                 .displayLarge
@@ -111,6 +136,27 @@ class _DetailsPageState extends State<DetailsPage> {
             },
             onComplete: () {
               debugPrint('Countdown Ended');
+
+              if (!_flag) {
+                setState(() {
+                  _flag = true;
+                  _currentStepIndex++;
+                });
+
+                if (_currentStepIndex >= steps.length) {
+                  setState(() {
+                    _currentStepIndex = 0;
+                    _actionText = 'Start workout';
+                  });
+                  _controller.pause();
+                } else {
+                  _controller.start();
+                }
+              } else {
+                setState(() {
+                  _flag = false;
+                });
+              }
             },
             onChange: (String timeStamp) {
               debugPrint('Countdown Changed $timeStamp');
@@ -120,7 +166,7 @@ class _DetailsPageState extends State<DetailsPage> {
               if (duration.inSeconds == 0) {
                 return _duration;
               } else if (duration.inSeconds == 5) {
-                return 'bob';
+                return _duration;
               } else {
                 return (_duration - duration.inSeconds).toString();
               }
@@ -133,22 +179,39 @@ class _DetailsPageState extends State<DetailsPage> {
               //elevation: 0,
               ),
           onPressed: () {
-            _controller.start();
+            if (!_controller.isStarted) {
+              _controller.start();
+              setState(() {
+                _actionText = 'Pause';
+              });
+            } else {
+              if (_controller.isPaused) {
+                _controller.resume();
+                setState(() {
+                  _actionText = 'Pause';
+                });
+              } else {
+                _controller.pause();
+                setState(() {
+                  _actionText = 'Resume';
+                });
+              }
+            }
           },
-          child: const Text("Start workout"),
+          child: Text(_actionText),
         ),
       ],
     );
   }
 
-  Column _nextSteps() {
+  Column _nextStepsWidget() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 20),
           child: Text(
-            'Next steps',
+            '${'Next steps (' + _nextSteps.length.toString()})',
             style: Theme.of(context).textTheme.displayLarge?.copyWith(
                 color: Theme.of(context).colorScheme.primary, fontSize: 20),
           ),
@@ -157,7 +220,7 @@ class _DetailsPageState extends State<DetailsPage> {
         Container(
           height: 90,
           child: ListView.separated(
-            itemCount: steps.length,
+            itemCount: _nextSteps.length,
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(left: 15, right: 15),
             separatorBuilder: (context, index) => const SizedBox(
@@ -175,16 +238,18 @@ class _DetailsPageState extends State<DetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Lateral plank',
+                        _nextSteps[index].name,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context)
                             .textTheme
                             .displayMedium
                             ?.copyWith(
-                                color: Theme.of(context).colorScheme.onTertiary),
+                                color:
+                                    Theme.of(context).colorScheme.onTertiary),
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        '2 min',
+                        Utils.formatTime(_nextSteps[index].duration),
                         style: Theme.of(context)
                             .textTheme
                             .displaySmall
@@ -201,7 +266,7 @@ class _DetailsPageState extends State<DetailsPage> {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            '30 sec',
+                            Utils.formatTime(_nextSteps[index].restDuration),
                             style: Theme.of(context)
                                 .textTheme
                                 .displaySmall

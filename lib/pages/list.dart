@@ -1,6 +1,7 @@
 import 'package:thibolt/common_libs.dart';
 
 import 'package:thibolt/models/workout.dart';
+import 'package:thibolt/pages/details.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({Key? key}) : super(key: key);
@@ -20,6 +21,21 @@ class _ListPageState extends State<ListPage> {
   Widget build(BuildContext context) {
     _getInitialInfo();
 
+    return Scaffold(
+      appBar: const NavBar(),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/background.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _pageContent(),
+      ),
+    );
+  }
+
+  Padding _pageContent() {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -32,17 +48,21 @@ class _ListPageState extends State<ListPage> {
                 scrollDirection: Axis.vertical,
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 itemBuilder: (context, index) => GestureDetector(
-                  onTap: () => {
-                    debugPrint("tapped on ${workouts[index].name}"),
-                  },
-                  child: BaseCard(
+                      onTap: () => {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => DetailsPage(workout: workouts[index]),
+                          ),
+                        ),
+                      },
+                      child: BaseCard(
                         title: workouts[index].name,
                         subTitle: Utils.formatTime(workouts[index].duration),
                         icon: const Image(
                           image: AssetImage('assets/icons/illu_top.png'),
                         ),
                       ),
-                ),
+                    ),
                 separatorBuilder: (context, index) => const SizedBox(
                       height: 15,
                     ),
