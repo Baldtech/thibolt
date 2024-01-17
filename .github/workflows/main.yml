@@ -2,7 +2,7 @@ name: "Build and Publish iOS"
 on: workflow_dispatch
 
 jobs:
-  build:
+  build_ipa:
     name: Build IPA
     runs-on: macos-latest
     steps:
@@ -50,6 +50,9 @@ jobs:
           value: 1.0.0+${{github.run_number}}
           commitChange: false
 
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Building IPA
         run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist
 
@@ -64,10 +67,46 @@ jobs:
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+
+  build_apk:
+    name: Build APK
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17.x'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Update package version
+        uses: fjogeleit/yaml-update-action@main
+        with:
+          valueFile: 'pubspec.yaml'
+          propertyPath: 'version'
+          value: 1.0.0+${{github.run_number}}
+          commitChange: false
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build android apk and appBundle
+        run: flutter build apk
+
+      - name: collect apk artifacts
+        uses: actions/upload-artifact@v4
+        with:
+         name: release-apk
+         path: build/app/outputs/flutter-apk/app-release.apk
   
   releaseTestFlight:
     name: Release ipa to TestFlight
-    needs: [ build ]
+    needs: [ build_ipa ]
     runs-on: macos-latest
 
     steps:
@@ -85,9 +124,9 @@ jobs:
         run: |
           xcrun altool --upload-app -f thibolt.ipa -t ios --username $APPLE_ACCOUNT_ID --password $APPLE_APP_SPECIFIC_PASSWORD
 
-  releaseFirebase:
+  releaseIpaFirebase:
     name: Release ipa to Firebase
-    needs: [ build ]
+    needs: [ build_ipa ]
     runs-on: ubuntu-latest
 
     steps:
@@ -104,3 +143,25 @@ jobs:
           appId: ${{secrets.FIREBASE_IOS_APP_ID}}
           serviceCredentialsFileContent: ${{secrets.CREDENTIAL_FILE_CONTENT}}
           file: thibolt.ipa
+          groups: internal-testers
+
+  releaseApkFirebase:
+    name: Release apk to Firebase
+    needs: [ build_apk ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get release-apk from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-apk
+
+      - name: Upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_ANDROID_APP_ID}}
+          serviceCredentialsFileContent: ${{secrets.CREDENTIAL_FILE_CONTENT}}
+          file: app-release.apk
+          groups: internal-testers
