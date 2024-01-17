@@ -77,8 +77,8 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'microsoft' # See 'Supported distributions' for available options
-          java-version: '21.x'
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17.x'
 
       - uses: subosito/flutter-action@v2
         with:
