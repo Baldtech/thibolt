@@ -1,5 +1,4 @@
-
-class StepModel{
+class StepModel {
   String name;
 
   StepModel({required this.name});

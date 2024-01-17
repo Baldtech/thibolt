@@ -1,6 +1,7 @@
 import 'package:thibolt/common/app_bar.dart';
 import 'package:thibolt/common_libs.dart';
 import 'package:thibolt/pages/details.dart';
+import 'package:thibolt/pages/list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          child: const DetailsPage(),
+          child: const ListPage(),
         ),
       ),
     );

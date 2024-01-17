@@ -22,11 +22,11 @@ class BaseCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).shadowColor.withOpacity(0.2),
-              blurRadius: 10.0,
+              blurRadius: 1.0,
               spreadRadius: 1.0,
               offset: const Offset(
-                3.0,
-                3.0,
+                1.0,
+                1.0,
               ),
             ),
           ]),
@@ -52,7 +52,7 @@ class BaseCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  subTitle,
+                  subTitle == null ? '' : subTitle!,
                   style: Theme.of(context).textTheme.displaySmall!.copyWith(
                     color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                   ),
