@@ -108,12 +108,12 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Find and Replace
-        uses: jacobtomlinson/gha-find-replace@v3
+      - name: Replace string in file
+        uses: MathieuSoysal/replace-string-in-file@v1.0.0
         with:
-          find: "be.baldtech.thibolt.adhoc"
-          replace: "be.baldtech.thibolt.distribution"
-          include: "**project.pbxproj"
+          file: ios/Runner.xcodeproj/project.pbxproj
+          old-string: be.baldtech.thibolt.adhoc
+          new-string: be.baldtech.thibolt.distribution
           
       - name: Update package version
         uses: fjogeleit/yaml-update-action@main
