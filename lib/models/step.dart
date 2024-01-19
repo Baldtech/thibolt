@@ -31,9 +31,9 @@ class StepModel {
       }
     }
     else {
-      steps.add(StepModel(name: 'Plank', duration: 5, restDuration: 10));
+      steps.add(StepModel(name: 'Plank', duration: 4, restDuration: 10));
       steps.add(StepModel(name: 'Plank 2', duration: 5, restDuration: 10));
-      steps.add(StepModel(name: 'Plank 3', duration: 5, restDuration: 10));
+      steps.add(StepModel(name: 'Plank 3', duration: 6, restDuration: 10));
     }
 
     return steps;

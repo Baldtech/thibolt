@@ -21,7 +21,6 @@ class _DetailsPageState extends State<DetailsPage> {
   List<StepModel> _nextSteps = [];
   int _currentStepIndex = 0;
   String _actionText = 'Start workout';
-  bool _flag = false;
   String _titleText = "";
 
   void _getInitialInfo() {
@@ -59,7 +58,7 @@ class _DetailsPageState extends State<DetailsPage> {
             child: Column(
               children: [
                 const SizedBox(height: 10),
-                _title(),
+                _titleWidget(context),
                 const SizedBox(height: 10),
                 _current(context),
                 const SizedBox(height: 35),
@@ -72,18 +71,58 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
-  Padding _title() {
+  Padding _titleWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(15),
-      child: BaseCard(
-        title: widget.workout.name,
-        subTitle: Utils.formatTime(widget.workout.duration),
-        icon: const Image(
-          image: AssetImage('assets/icons/illu_top.png'),
-        ),
-      ),
-    );
+                padding: const EdgeInsets.all(15),
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 80,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondary,
+                          borderRadius: BorderRadius.circular(45),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context)
+                                  .shadowColor
+                                  .withOpacity(0.2),
+                              blurRadius: 1.0,
+                              spreadRadius: 1.0,
+                              offset: const Offset(
+                                1.0,
+                                1.0,
+                              ),
+                            ),
+                          ]),
+                    ),
+                    Positioned(
+                        top: 27,
+                        left: 13,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                          ),
+                        )),
+                    Positioned.fill(
+                      top: 0,
+                      left: 35,
+                      child: BaseCard(
+                        title: widget.workout.name,
+                        subTitle: Utils.formatTime(widget.workout.duration),
+                        icon: const Image(
+                          image: AssetImage('assets/icons/illu_top.png'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
   }
+
 
   Column _current(context) {
     return Column(
@@ -128,48 +167,32 @@ class _DetailsPageState extends State<DetailsPage> {
                 fontSize: 40,
                 fontWeight: FontWeight.w300),
             textFormat: CountdownTextFormat.S,
-            isReverse: false,
+            isReverse: true,
             isReverseAnimation: false,
             isTimerTextShown: true,
-            onStart: () {
-              debugPrint('Countdown Started');
-            },
             onComplete: () {
-              debugPrint('Countdown Ended');
+              setState(() {
+                _currentStepIndex++;
+              });
 
-              if (!_flag) {
+              if (_currentStepIndex >= steps.length) {
                 setState(() {
-                  _flag = true;
-                  _currentStepIndex++;
+                  _currentStepIndex = 0;
+                  _duration = steps[_currentStepIndex].duration;
+                  _actionText = 'Start workout';
                 });
-
-                if (_currentStepIndex >= steps.length) {
-                  setState(() {
-                    _currentStepIndex = 0;
-                    _actionText = 'Start workout';
-                  });
-                  _controller.pause();
-                } else {
-                  _controller.start();
-                }
+                _controller.reset();
               } else {
                 setState(() {
-                  _flag = false;
+                  _duration = steps[_currentStepIndex].duration;
                 });
+                _controller.restart(
+                    duration: steps[_currentStepIndex].duration);
               }
-            },
-            onChange: (String timeStamp) {
-              debugPrint('Countdown Changed $timeStamp');
             },
             timeFormatterFunction: (defaultFormatterFunction, duration) {
-              debugPrint(duration.inSeconds.toString());
-              if (duration.inSeconds == 0) {
-                return _duration;
-              } else if (duration.inSeconds == 5) {
-                return _duration;
-              } else {
-                return (_duration - duration.inSeconds).toString();
-              }
+              double seconds = duration.inMilliseconds / 1000;
+              return seconds.toStringAsFixed(1);
             },
           ),
         ),
@@ -180,7 +203,7 @@ class _DetailsPageState extends State<DetailsPage> {
               ),
           onPressed: () {
             if (!_controller.isStarted) {
-              _controller.start();
+              _controller.restart(duration: steps[_currentStepIndex].duration);
               setState(() {
                 _actionText = 'Pause';
               });
@@ -211,7 +234,7 @@ class _DetailsPageState extends State<DetailsPage> {
         Padding(
           padding: const EdgeInsets.only(left: 20),
           child: Text(
-            '${'Next steps (' + _nextSteps.length.toString()})',
+            '${'Next steps (${_nextSteps.length}'})',
             style: Theme.of(context).textTheme.displayLarge?.copyWith(
                 color: Theme.of(context).colorScheme.primary, fontSize: 20),
           ),
