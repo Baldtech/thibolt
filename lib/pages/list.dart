@@ -46,7 +46,6 @@ class _ListPageState extends State<ListPage> {
             child: ListView.separated(
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
-                padding: const EdgeInsets.only(left: 15, right: 15),
                 itemBuilder: (context, index) => GestureDetector(
                       onTap: () => {
                         Navigator.of(context).push(
@@ -58,8 +57,10 @@ class _ListPageState extends State<ListPage> {
                       child: BaseCard(
                         title: workouts[index].name,
                         subTitle: Utils.formatTime(workouts[index].duration),
-                        icon: const Image(
-                          image: AssetImage('assets/icons/illu_top.png'),
+                        icon: SvgPicture.asset(
+                          'assets/icons/${workouts[index].category}.svg',
+                          height: 28,
+                          width: 28,
                         ),
                       ),
                     ),

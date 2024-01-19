@@ -3,7 +3,7 @@ import 'package:thibolt/common_libs.dart';
 class BaseCard extends StatelessWidget {
   final String title;
   final String subTitle;
-  final Image icon;
+  final SvgPicture icon;
 
   const BaseCard(
       {Key? key,
@@ -52,7 +52,7 @@ class BaseCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  subTitle ?? '',
+                  subTitle,
                   style: Theme.of(context).textTheme.displaySmall!.copyWith(
                         color: Theme.of(context)
                             .colorScheme
