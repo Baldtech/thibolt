@@ -12,6 +12,10 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
+  final formKey = GlobalKey<FormState>();
+  String dropdownValue = CategoryModel.categories.first.name;
+  String workoutName = "";
+
   final List<StepModel> steps = [
     StepModel(name: 'Plank', duration: 60, restDuration: 15, order: 0),
     StepModel(name: 'Plank 2', duration: 60, restDuration: 15, order: 1),
@@ -135,63 +139,113 @@ class _AddPageState extends State<AddPage> {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-              child: const Text("<"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  steps.add(StepModel(
-                      name: "Step",
-                      order: steps.length,
-                      type: StepType.single,
-                      duration: 60,
-                      restDuration: 15));
-                });
-              },
-              child: const Text("Step"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  steps.add(StepModel(
-                      name: "Block",
-                      order: steps.length,
-                      type: StepType.block,
-                      occurence: 2,
-                      children: [
-                        StepModel(
-                            name: "Sub 1",
-                            order: 0,
+        ElevatedButton(
+          onPressed: () async {
+            Navigator.pop(context);
+          },
+          child: const Text("<"),
+        ),
+        Form(
+          key: formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                initialValue: workoutName,
+                decoration: const InputDecoration(hintText: 'Workout name'),
+                onSaved: (val) {
+                  setState(() {
+                    workoutName = val!;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  return null;
+                },
+              ),
+              DropdownButton<String>(
+                value: dropdownValue,
+                icon: const Icon(Icons.arrow_downward),
+                elevation: 16,
+                style: const TextStyle(color: Colors.deepPurple),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String? value) {
+                  // This is called when the user selects an item.
+                  setState(() {
+                    dropdownValue = value!;
+                  });
+                },
+                items: CategoryModel.categories
+                    .map<DropdownMenuItem<String>>((CategoryModel value) {
+                  return DropdownMenuItem<String>(
+                    value: value.name,
+                    child: Text(value.name),
+                  );
+                }).toList(),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        steps.add(StepModel(
+                            name: "Step",
+                            order: steps.length,
+                            type: StepType.single,
                             duration: 60,
-                            restDuration: 15),
-                        StepModel(
-                            name: "Sub 2",
-                            order: 1,
-                            duration: 60,
-                            restDuration: 15)
-                      ]));
-                });
-              },
-              child: const Text("Block"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Workout.workouts.add(Workout(
-                    id: Workout.workouts.length,
-                    name: "Test",
-                    category: CategoryModel.categories.first));
-                Navigator.pop(context);
-              },
-              child: const Text("Save"),
-            ),
-          ],
+                            restDuration: 15));
+                      });
+                    },
+                    child: const Text("Step"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        steps.add(StepModel(
+                            name: "Block",
+                            order: steps.length,
+                            type: StepType.block,
+                            occurence: 2,
+                            children: [
+                              StepModel(
+                                  name: "Sub 1",
+                                  order: 0,
+                                  duration: 60,
+                                  restDuration: 15),
+                              StepModel(
+                                  name: "Sub 2",
+                                  order: 1,
+                                  duration: 60,
+                                  restDuration: 15)
+                            ]));
+                      });
+                    },
+                    child: const Text("Block"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        formKey.currentState!.save();
+                        Workout.workouts.add(Workout(
+                            id: Workout.workouts.length,
+                            name: workoutName,
+                            category: CategoryModel.categories.firstWhere(
+                                (element) => element.name == dropdownValue)));
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text("Save"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         const SizedBox(
           height: 20,
