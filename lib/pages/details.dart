@@ -3,11 +3,13 @@ import 'package:thibolt/common_libs.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:thibolt/models/step.dart';
 import 'package:thibolt/models/workout.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class DetailsPage extends StatefulWidget {
-  const DetailsPage({Key? key, required this.workout}) : super(key: key);
+  DetailsPage({Key? key, required this.workout}) : super(key: key);
 
   final Workout workout;
+  final AudioPlayer _audioCache = AudioPlayer();
 
   @override
   State<DetailsPage> createState() => _DetailsPageState();
@@ -22,6 +24,9 @@ class _DetailsPageState extends State<DetailsPage> {
   int _currentStepIndex = 0;
   String _actionText = 'Start workout';
   String _titleText = "";
+  bool _isCurrentRest = false;
+  String _restDuration = "";
+  int _currentSecond = -1;
 
   void _getInitialInfo() {
     steps = StepModel.getStepsByWorkoutId(widget.workout.id);
@@ -73,56 +78,55 @@ class _DetailsPageState extends State<DetailsPage> {
 
   Padding _titleWidget(BuildContext context) {
     return Padding(
-                padding: const EdgeInsets.all(15),
-                child: Stack(
-                  children: [
-                    Container(
-                      height: 80,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
-                          borderRadius: BorderRadius.circular(45),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context)
-                                  .shadowColor
-                                  .withOpacity(0.2),
-                              blurRadius: 1.0,
-                              spreadRadius: 1.0,
-                              offset: const Offset(
-                                1.0,
-                                1.0,
-                              ),
-                            ),
-                          ]),
+      padding: const EdgeInsets.all(15),
+      child: Stack(
+        children: [
+          Container(
+            height: 80,
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(45),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).shadowColor.withOpacity(0.2),
+                    blurRadius: 1.0,
+                    spreadRadius: 1.0,
+                    offset: const Offset(
+                      1.0,
+                      1.0,
                     ),
-                    Positioned(
-                        top: 27,
-                        left: 13,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white,
-                          ),
-                        )),
-                    Positioned.fill(
-                      top: 0,
-                      left: 35,
-                      child: BaseCard(
-                        title: widget.workout.name,
-                        subTitle: Utils.formatTime(widget.workout.duration),
-                        icon: const Image(
-                          image: AssetImage('assets/icons/illu_top.png'),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                ]),
+          ),
+          Positioned(
+              top: 27,
+              left: 13,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
                 ),
-              );
+              )),
+          Positioned.fill(
+            top: 0,
+            left: 35,
+            child: BaseCard(
+              title: widget.workout.name,
+              subTitle: Utils.formatTime(widget.workout.duration),
+              icon: SvgPicture.asset(
+                'assets/icons/${widget.workout.category}.svg',
+                height: 28,
+                width: 28,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
-
 
   Column _current(context) {
     return Column(
@@ -141,59 +145,132 @@ class _DetailsPageState extends State<DetailsPage> {
         const SizedBox(height: 35),
         Padding(
           padding: const EdgeInsets.only(left: 70.0, right: 70.0),
-          child: CircularCountDownTimer(
-            autoStart: false,
-            duration: _duration,
-            initialDuration: 0,
-            controller: _controller,
-            width: 200,
-            height: 200,
-            ringColor: Theme.of(context).colorScheme.surface,
-            ringGradient: null,
-            fillColor: Theme.of(context).colorScheme.surface,
-            fillGradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color.fromRGBO(207, 216, 255, 1),
-                Color.fromRGBO(217, 203, 242, 1),
-                Color.fromRGBO(201, 234, 235, 1),
-              ],
-            ),
-            strokeWidth: 20.0,
-            strokeCap: StrokeCap.round,
-            textStyle: Theme.of(context).textTheme.displayLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 40,
-                fontWeight: FontWeight.w300),
-            textFormat: CountdownTextFormat.S,
-            isReverse: true,
-            isReverseAnimation: false,
-            isTimerTextShown: true,
-            onComplete: () {
-              setState(() {
-                _currentStepIndex++;
-              });
+          child: Stack(
+            children: [
+              CircularCountDownTimer(
+                autoStart: false,
+                duration: _duration,
+                initialDuration: 0,
+                controller: _controller,
+                width: 200,
+                height: 200,
+                ringColor: Theme.of(context).colorScheme.surface,
+                ringGradient: null,
+                fillColor: Theme.of(context).colorScheme.surface,
+                fillGradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(207, 216, 255, 1),
+                    Color.fromRGBO(217, 203, 242, 1),
+                    Color.fromRGBO(201, 234, 235, 1),
+                  ],
+                ),
+                strokeWidth: 20.0,
+                strokeCap: StrokeCap.round,
+                textStyle: Theme.of(context).textTheme.displayLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 40,
+                    fontWeight: FontWeight.w300),
+                textFormat: CountdownTextFormat.S,
+                isReverse: true,
+                isReverseAnimation: false,
+                isTimerTextShown: true,
+                onComplete: () {
+                  Future.delayed(Duration.zero, () async {
+                      widget._audioCache
+                          .play(AssetSource('audio/step-end.mp3'));
 
-              if (_currentStepIndex >= steps.length) {
-                setState(() {
-                  _currentStepIndex = 0;
-                  _duration = steps[_currentStepIndex].duration;
-                  _actionText = 'Start workout';
-                });
-                _controller.reset();
-              } else {
-                setState(() {
-                  _duration = steps[_currentStepIndex].duration;
-                });
-                _controller.restart(
-                    duration: steps[_currentStepIndex].duration);
-              }
-            },
-            timeFormatterFunction: (defaultFormatterFunction, duration) {
-              double seconds = duration.inMilliseconds / 1000;
-              return seconds.toStringAsFixed(1);
-            },
+                      setState(() {
+                        _currentSecond =  -1;
+                      });
+                    });
+                  if (!_isCurrentRest) {
+                    if (steps[_currentStepIndex].restDuration > 0) {
+                      setState(() {
+                        _isCurrentRest = true;
+                        _duration = steps[_currentStepIndex].restDuration;
+                      });
+                      _controller.restart(
+                          duration: steps[_currentStepIndex].restDuration);
+                      return;
+                    }
+                  }
+                  setState(() {
+                    _currentStepIndex++;
+                    _isCurrentRest = false;
+                  });
+
+                  if (_currentStepIndex >= steps.length) {
+                    setState(() {
+                      _currentStepIndex = 0;
+                      _duration = steps[_currentStepIndex].duration;
+                      _actionText = 'Start workout';
+                    });
+                    _controller.reset();
+                  } else {
+                    setState(() {
+                      _duration = steps[_currentStepIndex].duration;
+                    });
+                    _controller.restart(
+                        duration: steps[_currentStepIndex].duration);
+                  }
+                },
+                timeFormatterFunction: (defaultFormatterFunction, duration) {
+                  if (_currentSecond == -1) {
+                    _currentSecond = duration.inSeconds;
+                  }
+                  if (_currentSecond != duration.inSeconds &&
+                      duration.inSeconds < 5) {
+                    Future.delayed(Duration.zero, () async {
+                      widget._audioCache
+                          .play(AssetSource('audio/step-beep.mp3'));
+
+                      setState(() {
+                        _currentSecond = duration.inSeconds;
+                      });
+                    });
+                  }
+
+                  double seconds = duration.inMilliseconds / 1000;
+                  if (_isCurrentRest) {
+                    Future.delayed(Duration.zero, () async {
+                      setState(() {
+                        _restDuration = seconds.toStringAsFixed(1);
+                      });
+                    });
+                    return '';
+                  }
+                  Future.delayed(Duration.zero, () async {
+                    setState(() {
+                      _restDuration = "";
+                    });
+                  });
+                  return seconds.toStringAsFixed(1);
+                },
+              ),
+              Positioned(
+                top: 50,
+                left: 62,
+                child: Column(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/rest.svg',
+                      height: _isCurrentRest ? 70 : 0,
+                      width: _isCurrentRest ? 70 : 0,
+                    ),
+                    const SizedBox(height: 17),
+                    Text(_restDuration,
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayLarge
+                            ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 25))
+                  ],
+                ),
+              )
+            ],
           ),
         ),
         const SizedBox(height: 35),
@@ -201,7 +278,7 @@ class _DetailsPageState extends State<DetailsPage> {
           style: ElevatedButton.styleFrom(
               //elevation: 0,
               ),
-          onPressed: () {
+          onPressed: () async {
             if (!_controller.isStarted) {
               _controller.restart(duration: steps[_currentStepIndex].duration);
               setState(() {
@@ -283,7 +360,7 @@ class _DetailsPageState extends State<DetailsPage> {
                       Row(
                         children: [
                           SvgPicture.asset(
-                            'assets/icons/app-icon.svg',
+                            'assets/icons/rest.svg',
                             height: 13,
                             width: 13,
                           ),
