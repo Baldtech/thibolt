@@ -17,19 +17,20 @@ class BaseCard extends StatelessWidget {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onPrimary,
-          borderRadius: BorderRadius.circular(45),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.2),
-              blurRadius: 1.0,
-              spreadRadius: 1.0,
-              offset: const Offset(
-                1.0,
-                1.0,
-              ),
+        color: Theme.of(context).colorScheme.onPrimary,
+        borderRadius: BorderRadius.circular(45),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.2),
+            blurRadius: 1.0,
+            spreadRadius: 1.0,
+            offset: const Offset(
+              1.0,
+              1.0,
             ),
-          ]),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Padding(
@@ -45,17 +46,19 @@ class BaseCard extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w700
-                  ),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w700),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  subTitle == null ? '' : subTitle!,
+                  subTitle ?? '',
                   style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                  ),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.7),
+                      ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
