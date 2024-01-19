@@ -117,7 +117,7 @@ class _DetailsPageState extends State<DetailsPage> {
               title: widget.workout.name,
               subTitle: Utils.formatTime(widget.workout.duration),
               icon: SvgPicture.asset(
-                'assets/icons/${widget.workout.category}.svg',
+                'assets/icons/${widget.workout.category.icon}',
                 height: 28,
                 width: 28,
               ),
@@ -176,78 +176,8 @@ class _DetailsPageState extends State<DetailsPage> {
                 isReverse: true,
                 isReverseAnimation: false,
                 isTimerTextShown: true,
-                onComplete: () {
-                  Future.delayed(Duration.zero, () async {
-                      widget._audioCache
-                          .play(AssetSource('audio/step-end.mp3'));
-
-                      setState(() {
-                        _currentSecond =  -1;
-                      });
-                    });
-                  if (!_isCurrentRest) {
-                    if (steps[_currentStepIndex].restDuration > 0) {
-                      setState(() {
-                        _isCurrentRest = true;
-                        _duration = steps[_currentStepIndex].restDuration;
-                      });
-                      _controller.restart(
-                          duration: steps[_currentStepIndex].restDuration);
-                      return;
-                    }
-                  }
-                  setState(() {
-                    _currentStepIndex++;
-                    _isCurrentRest = false;
-                  });
-
-                  if (_currentStepIndex >= steps.length) {
-                    setState(() {
-                      _currentStepIndex = 0;
-                      _duration = steps[_currentStepIndex].duration;
-                      _actionText = 'Start workout';
-                    });
-                    _controller.reset();
-                  } else {
-                    setState(() {
-                      _duration = steps[_currentStepIndex].duration;
-                    });
-                    _controller.restart(
-                        duration: steps[_currentStepIndex].duration);
-                  }
-                },
-                timeFormatterFunction: (defaultFormatterFunction, duration) {
-                  if (_currentSecond == -1) {
-                    _currentSecond = duration.inSeconds;
-                  }
-                  if (_currentSecond != duration.inSeconds &&
-                      duration.inSeconds < 5) {
-                    Future.delayed(Duration.zero, () async {
-                      widget._audioCache
-                          .play(AssetSource('audio/step-beep.mp3'));
-
-                      setState(() {
-                        _currentSecond = duration.inSeconds;
-                      });
-                    });
-                  }
-
-                  double seconds = duration.inMilliseconds / 1000;
-                  if (_isCurrentRest) {
-                    Future.delayed(Duration.zero, () async {
-                      setState(() {
-                        _restDuration = seconds.toStringAsFixed(1);
-                      });
-                    });
-                    return '';
-                  }
-                  Future.delayed(Duration.zero, () async {
-                    setState(() {
-                      _restDuration = "";
-                    });
-                  });
-                  return seconds.toStringAsFixed(1);
-                },
+                onComplete: onStepComplete,
+                timeFormatterFunction: timerFormatter,
               ),
               Positioned(
                 top: 50,
@@ -302,6 +232,75 @@ class _DetailsPageState extends State<DetailsPage> {
         ),
       ],
     );
+  }
+
+  timerFormatter(defaultFormatterFunction, duration) {
+    if (_currentSecond == -1) {
+      _currentSecond = duration.inSeconds;
+    }
+    if (_currentSecond != duration.inSeconds && duration.inSeconds < 5) {
+      Future.delayed(Duration.zero, () async {
+        widget._audioCache.play(AssetSource('audio/step-beep.mp3'));
+
+        setState(() {
+          _currentSecond = duration.inSeconds;
+        });
+      });
+    }
+
+    double seconds = duration.inMilliseconds / 1000;
+    if (_isCurrentRest) {
+      Future.delayed(Duration.zero, () async {
+        setState(() {
+          _restDuration = seconds.toStringAsFixed(1);
+        });
+      });
+      return '';
+    }
+    Future.delayed(Duration.zero, () async {
+      setState(() {
+        _restDuration = "";
+      });
+    });
+    return seconds.toStringAsFixed(1);
+  }
+
+  void onStepComplete() {
+    Future.delayed(Duration.zero, () async {
+      widget._audioCache.play(AssetSource('audio/step-end.mp3'));
+
+      setState(() {
+        _currentSecond = -1;
+      });
+    });
+    if (!_isCurrentRest) {
+      if (steps[_currentStepIndex].restDuration > 0) {
+        setState(() {
+          _isCurrentRest = true;
+          _duration = steps[_currentStepIndex].restDuration;
+        });
+        _controller.restart(duration: steps[_currentStepIndex].restDuration);
+        return;
+      }
+    }
+    setState(() {
+      _currentStepIndex++;
+      _isCurrentRest = false;
+    });
+
+    if (_currentStepIndex >= steps.length) {
+      setState(() {
+        _currentStepIndex = 0;
+        _duration = steps[_currentStepIndex].duration;
+        _actionText = 'Start workout';
+      });
+      _controller.reset();
+    } else {
+      setState(() {
+        _duration = steps[_currentStepIndex].duration;
+      });
+      _controller.restart(duration: steps[_currentStepIndex].duration);
+    }
   }
 
   Column _nextStepsWidget() {

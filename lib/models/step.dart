@@ -2,8 +2,9 @@ class StepModel {
   String name;
   int duration;
   int restDuration;
+  int order;
 
-  StepModel({required this.name, this.duration = 0, this.restDuration = 0});
+  StepModel({required this.name, this.duration = 0, this.restDuration = 0, this.order = 0});
 
   static List<StepModel> getSteps() {
     List<StepModel> steps = [];

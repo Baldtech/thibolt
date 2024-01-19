@@ -1,6 +1,7 @@
 import 'package:thibolt/common_libs.dart';
 
 import 'package:thibolt/models/workout.dart';
+import 'package:thibolt/pages/add.dart';
 import 'package:thibolt/pages/details.dart';
 
 class ListPage extends StatefulWidget {
@@ -14,7 +15,13 @@ class _ListPageState extends State<ListPage> {
   List<Workout> workouts = [];
 
   void _getInitialInfo() {
-    workouts = Workout.getWorkouts();
+    workouts = Workout.workouts;
+  }
+
+  Future<void> _pullRefresh() async {
+    setState(() {
+      workouts = Workout.workouts;
+    });
   }
 
   @override
@@ -43,31 +50,35 @@ class _ListPageState extends State<ListPage> {
           _header(),
           const SizedBox(height: 20),
           Expanded(
-            child: ListView.separated(
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemBuilder: (context, index) => GestureDetector(
-                      onTap: () => {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => DetailsPage(workout: workouts[index]),
+            child: RefreshIndicator(
+              onRefresh: _pullRefresh,
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (context, index) => GestureDetector(
+                        onTap: () => {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailsPage(workout: workouts[index]),
+                            ),
+                          ),
+                        },
+                        child: BaseCard(
+                          title: workouts[index].name,
+                          subTitle: Utils.formatTime(workouts[index].duration),
+                          icon: SvgPicture.asset(
+                            'assets/icons/${workouts[index].category.icon}',
+                            height: 28,
+                            width: 28,
                           ),
                         ),
-                      },
-                      child: BaseCard(
-                        title: workouts[index].name,
-                        subTitle: Utils.formatTime(workouts[index].duration),
-                        icon: SvgPicture.asset(
-                          'assets/icons/${workouts[index].category}.svg',
-                          height: 28,
-                          width: 28,
-                        ),
                       ),
-                    ),
-                separatorBuilder: (context, index) => const SizedBox(
-                      height: 15,
-                    ),
-                itemCount: workouts.length),
+                  separatorBuilder: (context, index) => const SizedBox(
+                        height: 15,
+                      ),
+                  itemCount: workouts.length),
+            ),
           ),
         ],
       ),
@@ -81,7 +92,13 @@ class _ListPageState extends State<ListPage> {
         style: ElevatedButton.styleFrom(
             //elevation: 0,
             ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const AddPage(),
+            ),
+          ).then((value) => _pullRefresh());
+        },
         child: const Text("+ New workout"),
       ),
     );
