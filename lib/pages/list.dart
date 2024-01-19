@@ -1,7 +1,7 @@
 import 'package:thibolt/common_libs.dart';
 
 import 'package:thibolt/models/workout.dart';
-import 'package:thibolt/pages/add.dart';
+import 'package:thibolt/pages/add_v2.dart';
 import 'package:thibolt/pages/details.dart';
 
 class ListPage extends StatefulWidget {

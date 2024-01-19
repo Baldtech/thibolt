@@ -13,7 +13,6 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
-  void _getInitialInfo() {}
 
   var steps = [
     StepModel(name: 'Plank', duration: 60, restDuration: 15, order: 0),
@@ -22,7 +21,6 @@ class _AddPageState extends State<AddPage> {
 
   @override
   Widget build(BuildContext context) {
-    _getInitialInfo();
 
     return Scaffold(
       appBar: const NavBar(),
@@ -78,7 +76,7 @@ class _AddPageState extends State<AddPage> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => _buildPopupDialog(
-                        context, new StepModel(name: ""),
+                        context, StepModel(name: ""),
                         newStep: true),
                   );
                 },
