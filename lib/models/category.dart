@@ -1,11 +1,11 @@
-class CategoryModel{
+class Category{
   String name;
   String icon;
-  CategoryModel({required this.name, required this.icon});
+  Category({required this.name, required this.icon});
 
-  static List<CategoryModel> categories = [
-    CategoryModel(name: 'core', icon: 'core.svg'),
-    CategoryModel(name: 'stretching', icon: 'stretching.svg'),
-    CategoryModel(name: 'swim', icon: 'swim.svg'),
+  static List<Category> categories = [
+    Category(name: 'core', icon: 'core.svg'),
+    Category(name: 'stretching', icon: 'stretching.svg'),
+    Category(name: 'swim', icon: 'swim.svg'),
   ];
 }

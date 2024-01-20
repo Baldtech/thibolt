@@ -1,8 +1,6 @@
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:thibolt/common_libs.dart';
 import 'package:thibolt/models/category.dart';
-import 'package:thibolt/models/step.dart';
-import 'package:thibolt/models/workout.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({Key? key}) : super(key: key);
@@ -13,20 +11,20 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final formKey = GlobalKey<FormState>();
-  String dropdownValue = CategoryModel.categories.first.name;
+  String dropdownValue = Category.categories.first.name;
   String workoutName = "";
 
-  final List<StepModel> steps = [
-    StepModel(name: 'Plank', duration: 60, restDuration: 15, order: 0),
-    StepModel(name: 'Plank 2', duration: 60, restDuration: 15, order: 1),
-    StepModel(
+  final List<WorkoutStep> steps = [
+    WorkoutStep(name: 'Plank', duration: 60, restDuration: 15, order: 0),
+    WorkoutStep(name: 'Plank 2', duration: 60, restDuration: 15, order: 1),
+    WorkoutStep(
         name: 'Block 1',
         order: 2,
         type: StepType.block,
         occurence: 2,
         children: [
-          StepModel(name: 'Sub 1', duration: 60, restDuration: 15, order: 0),
-          StepModel(name: 'Sub 2 2', duration: 60, restDuration: 15, order: 1),
+          WorkoutStep(name: 'Sub 1', duration: 60, restDuration: 15, order: 0),
+          WorkoutStep(name: 'Sub 2 2', duration: 60, restDuration: 15, order: 1),
         ]),
   ];
 
@@ -47,7 +45,7 @@ class _AddPageState extends State<AddPage> {
                     ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            step.children!.add(StepModel(
+                            step.children!.add(WorkoutStep(
                                 name: "Step",
                                 order: step.children!.length,
                                 duration: 60,
@@ -180,8 +178,8 @@ class _AddPageState extends State<AddPage> {
                     dropdownValue = value!;
                   });
                 },
-                items: CategoryModel.categories
-                    .map<DropdownMenuItem<String>>((CategoryModel value) {
+                items: Category.categories
+                    .map<DropdownMenuItem<String>>((Category value) {
                   return DropdownMenuItem<String>(
                     value: value.name,
                     child: Text(value.name),
@@ -194,7 +192,7 @@ class _AddPageState extends State<AddPage> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        steps.add(StepModel(
+                        steps.add(WorkoutStep(
                             name: "Step",
                             order: steps.length,
                             type: StepType.single,
@@ -207,18 +205,18 @@ class _AddPageState extends State<AddPage> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        steps.add(StepModel(
+                        steps.add(WorkoutStep(
                             name: "Block",
                             order: steps.length,
                             type: StepType.block,
                             occurence: 2,
                             children: [
-                              StepModel(
+                              WorkoutStep(
                                   name: "Sub 1",
                                   order: 0,
                                   duration: 60,
                                   restDuration: 15),
-                              StepModel(
+                              WorkoutStep(
                                   name: "Sub 2",
                                   order: 1,
                                   duration: 60,
@@ -235,7 +233,7 @@ class _AddPageState extends State<AddPage> {
                         Workout.workouts.add(Workout(
                             id: Workout.workouts.length,
                             name: workoutName,
-                            category: CategoryModel.categories.firstWhere(
+                            category: Category.categories.firstWhere(
                                 (element) => element.name == dropdownValue)));
                         Navigator.pop(context);
                       }

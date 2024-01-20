@@ -14,6 +14,10 @@ const onErrorColor = Colors.white;
 const surfaceColor = Color.fromRGBO(234, 234, 234, 1);
 const onSurfaceColor = Colors.white;
 
+const timerGradient1 = Color.fromRGBO(207, 216, 255, 1);
+const timerGradient2 = Color.fromRGBO(217, 203, 242, 1);
+const timerGradient3 = Color.fromRGBO(201, 234, 235, 1);
+
 ThemeData lightTheme = ThemeData(
   useMaterial3: true,
   fontFamily: 'URWGothic',

@@ -1,15 +1,15 @@
 enum StepType { block, single }
 
-class StepModel {
+class WorkoutStep {
   String name;
   int duration;
   int restDuration;
   int order;
   StepType type = StepType.single;
-  List<StepModel>? children;
+  List<WorkoutStep>? children;
   int occurence = 0;
 
-  StepModel(
+  WorkoutStep(
       {required this.name,
       this.duration = 0,
       this.restDuration = 0,
@@ -17,52 +17,52 @@ class StepModel {
       this.type = StepType.single,
       this.occurence = 0, this.children = const []});
 
-  static List<StepModel> getSteps() {
-    List<StepModel> steps = [];
+  static List<WorkoutStep> getSteps() {
+    List<WorkoutStep> workoutSteps = [];
 
-    steps.add(StepModel(name: 'Run'));
-    steps.add(StepModel(name: 'Bike'));
-    steps.add(StepModel(name: 'Swim'));
-    steps.add(StepModel(name: 'Swim'));
+    workoutSteps.add(WorkoutStep(name: 'Run'));
+    workoutSteps.add(WorkoutStep(name: 'Bike'));
+    workoutSteps.add(WorkoutStep(name: 'Swim'));
+    workoutSteps.add(WorkoutStep(name: 'Swim'));
 
-    return steps;
+    return workoutSteps;
   }
 
-  static List<StepModel> getStepsByWorkoutId(int workoutId) {
-    List<StepModel> steps = [];
+  static List<WorkoutStep> getStepsByWorkoutId(int workoutId) {
+    List<WorkoutStep> workoutSteps = [];
 
     if (workoutId == 1) {
       for (var i = 0; i < 3; i++) {
-        steps.add(StepModel(name: 'Plank', duration: 60, restDuration: 15));
-        steps.add(StepModel(
+        workoutSteps.add(WorkoutStep(name: 'Plank', duration: 60, restDuration: 15));
+        workoutSteps.add(WorkoutStep(
             name: 'Lateral plank (R)', duration: 40, restDuration: 15));
-        steps.add(StepModel(
+        workoutSteps.add(WorkoutStep(
             name: 'Lateral plank (L)', duration: 40, restDuration: 15));
-        steps.add(StepModel(name: 'Bird dog', duration: 45, restDuration: 15));
-        steps.add(StepModel(
+        workoutSteps.add(WorkoutStep(name: 'Bird dog', duration: 45, restDuration: 15));
+        workoutSteps.add(WorkoutStep(
             name: 'Plank with extended arms/legs',
             duration: 45,
             restDuration: 15));
-        steps.add(StepModel(name: 'Superman', duration: 40, restDuration: 15));
-        steps.add(
-            StepModel(name: 'Hollow hold', duration: 40, restDuration: 15));
+        workoutSteps.add(WorkoutStep(name: 'Superman', duration: 40, restDuration: 15));
+        workoutSteps.add(
+            WorkoutStep(name: 'Hollow hold', duration: 40, restDuration: 15));
       }
     } else {
-      steps.add(StepModel(name: 'Plank', duration: 4, restDuration: 10));
-      steps.add(StepModel(name: 'Plank 2', duration: 5, restDuration: 10));
-      steps.add(StepModel(name: 'Plank 3', duration: 6, restDuration: 10));
+      workoutSteps.add(WorkoutStep(name: 'Plank', duration: 4, restDuration: 10));
+      workoutSteps.add(WorkoutStep(name: 'Plank 2', duration: 5, restDuration: 10));
+      workoutSteps.add(WorkoutStep(name: 'Plank 3', duration: 6, restDuration: 10));
     }
 
-    return steps;
+    return workoutSteps;
   }
 
   static int getDurationByWorkoutId(int workoutId) {
     int duration = 0;
 
-    var steps = getStepsByWorkoutId(workoutId);
-    for (var step in steps) {
-      duration += step.duration;
-      duration += step.restDuration;
+    var workoutSteps = getStepsByWorkoutId(workoutId);
+    for (var workoutStep in workoutSteps) {
+      duration += workoutStep.duration;
+      duration += workoutStep.restDuration;
     }
 
     return duration;

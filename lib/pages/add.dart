@@ -15,8 +15,8 @@ class AddPage extends StatefulWidget {
 class _AddPageState extends State<AddPage> {
 
   var steps = [
-    StepModel(name: 'Plank', duration: 60, restDuration: 15, order: 0),
-    StepModel(name: 'Plank 2', duration: 60, restDuration: 15, order: 1),
+    WorkoutStep(name: 'Plank', duration: 60, restDuration: 15, order: 0),
+    WorkoutStep(name: 'Plank 2', duration: 60, restDuration: 15, order: 1),
   ];
 
   @override
@@ -45,7 +45,7 @@ class _AddPageState extends State<AddPage> {
       }
 
       // get the tile we are moving
-      final StepModel tile = steps.removeAt(oldIndex);
+      final WorkoutStep tile = steps.removeAt(oldIndex);
       // place the tile in new position
       steps.insert(newIndex, tile);
     });
@@ -76,7 +76,7 @@ class _AddPageState extends State<AddPage> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => _buildPopupDialog(
-                        context, StepModel(name: ""),
+                        context, WorkoutStep(name: ""),
                         newStep: true),
                   );
                 },
@@ -90,7 +90,7 @@ class _AddPageState extends State<AddPage> {
                   Workout.workouts.add(Workout(
                       id: Workout.workouts.length,
                       name: "Test",
-                      category: CategoryModel.categories.first));
+                      category: Category.categories.first));
                   Navigator.pop(context);
                 },
                 child: const Text("Save workout"),
@@ -147,7 +147,7 @@ class _AddPageState extends State<AddPage> {
     );
   }
 
-  Widget _buildPopupDialog(BuildContext context, StepModel step,
+  Widget _buildPopupDialog(BuildContext context, WorkoutStep step,
       {bool newStep = false}) {
     final formKey = GlobalKey<FormState>();
 
