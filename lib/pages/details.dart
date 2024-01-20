@@ -19,7 +19,7 @@ class DetailsPage extends StatefulWidget {
 class _DetailsPageState extends State<DetailsPage> {
   var _duration = 0;
   final CountDownController _controller = CountDownController();
-  PanelController _pc = new PanelController();
+  final PanelController _pc = PanelController();
 
   List<StepModel> steps = [];
   List<StepModel> _nextSteps = [];
@@ -41,53 +41,64 @@ class _DetailsPageState extends State<DetailsPage> {
   Widget build(BuildContext context) {
     _getInitialInfo();
 
+    if (MediaQuery.of(context).size.height > 700) {
+      return Scaffold(
+        appBar: const NavBar(),
+        body: _pageContent(context),
+      );
+    }
+
     return Scaffold(
       appBar: const NavBar(),
-      body: SlidingUpPanel(
-        minHeight: 50,
-        maxHeight: 200,
-        controller: _pc,
-        panelBuilder: () {
-          return Column(children: [
-            Container(
-              alignment: Alignment.center,
-              height: 50.0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (!_pc.isPanelOpen) {
-                        _pc.open();
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          'Next steps (${_nextSteps.length})',
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge!
-                              .copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w300),
-                        ),
-                      ],
-                    ),
+      body: _slidingPanelWidget(context),
+    );
+  }
+
+  SlidingUpPanel _slidingPanelWidget(BuildContext context) {
+    return SlidingUpPanel(
+      minHeight: 50,
+      maxHeight: 180,
+      controller: _pc,
+      panelBuilder: () {
+        return Column(children: [
+          Container(
+            alignment: Alignment.center,
+            height: 50.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    if (!_pc.isPanelOpen) {
+                      _pc.open();
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        'Next steps (${_nextSteps.length})',
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayLarge!
+                            .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Divider(
-              height: 0.5,
-              color: Colors.grey[300],
-            ),
-                        _nextStepsWidget(),
-          ]);
-        },
-        body: _pageContent(context),
-      ),
+          ),
+          Divider(
+            height: 0.5,
+            color: Colors.grey[300],
+          ),
+          _nextStepsWidget(),
+        ]);
+      },
+      body: _pageContent(context),
     );
   }
 
@@ -109,7 +120,7 @@ class _DetailsPageState extends State<DetailsPage> {
             ),
           ),
           Visibility(
-            visible: false,
+            visible: MediaQuery.of(context).size.height > 700,
             replacement: const SizedBox.shrink(),
             child: Align(
               alignment: Alignment.bottomCenter,
@@ -430,7 +441,7 @@ class _DetailsPageState extends State<DetailsPage> {
             },
           ),
         ),
-        const SizedBox(height: 35),
+        const SizedBox(height: 15),
       ],
     );
   }
