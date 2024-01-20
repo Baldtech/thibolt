@@ -16,6 +16,7 @@ dependencies:
   audioplayers: ^5.2.1
   drag_and_drop_lists: ^0.3.3
 
+  sliding_up_panel2: ^3.3.0+1
 
 dev_dependencies:
   icons_launcher: ^2.1.3
