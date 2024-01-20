@@ -1,4 +1,9 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:thibolt/common_libs.dart';
+import 'package:thibolt/data/repositories/category_repository.dart';
+import 'package:thibolt/data/repositories/workout_repository.dart';
+import 'package:thibolt/data/sqlite_database.dart';
+import 'package:thibolt/models/category.dart';
 
 import 'package:thibolt/pages/add_v2.dart';
 import 'package:thibolt/pages/details.dart';
@@ -10,23 +15,36 @@ class ListPage extends StatefulWidget {
   State<ListPage> createState() => _ListPageState();
 }
 
-class _ListPageState extends State<ListPage> {
+class _ListPageState extends State<ListPage> with AfterLayoutMixin<ListPage> {
+  late ICategoryRepository categoryRepository;
+  late IWorkoutRepository workoutRepository;
+
+  List<Category> categories = [];
   List<Workout> workouts = [];
 
-  void _getInitialInfo() {
-    workouts = Workout.workouts;
+  @override
+  Future<void> afterFirstLayout(BuildContext context) async {
+    var db = await SQLiteDatabase().initializeDB();
+    categoryRepository = CategoryRepository(db: db);
+    workoutRepository = WorkoutRepository(db: db);
+    refreshData();
+  }
+
+  void refreshData() async {
+    final cat = await categoryRepository.getCategories();
+    final work = await workoutRepository.getWorkouts();
+    setState(() {
+      categories = cat;
+      workouts = work;
+    });
   }
 
   Future<void> pullRefresh() async {
-    setState(() {
-      workouts = Workout.workouts;
-    });
+    refreshData();
   }
 
   @override
   Widget build(BuildContext context) {
-    _getInitialInfo();
-
     return Scaffold(
       appBar: const NavBar(),
       body: Container(
@@ -92,7 +110,7 @@ class _ListPageState extends State<ListPage> {
                     title: workouts[index].name,
                     subTitle: Utils.formatTime(workouts[index].duration),
                     icon: SvgPicture.asset(
-                      'assets/icons/${workouts[index].category.icon}',
+                      'assets/icons/${categories.firstWhere((element) => element.id == workouts[index].categoryId).icon}',
                       height: 28,
                       width: 28,
                     ),

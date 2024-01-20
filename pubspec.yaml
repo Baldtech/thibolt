@@ -18,6 +18,8 @@ dependencies:
   sliding_up_panel2: ^3.3.0+1
   sqflite: ^2.3.0
   path: ^1.9.0
+  sqlite_schema_upgrader: ^1.0.6
+  after_layout: ^1.2.0
 
 dev_dependencies:
   icons_launcher: ^2.1.3

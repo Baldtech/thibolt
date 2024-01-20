@@ -177,7 +177,7 @@ class _DetailsPageState extends State<DetailsPage> {
               title: widget.workout.name,
               subTitle: Utils.formatTime(widget.workout.duration),
               icon: SvgPicture.asset(
-                'assets/icons/${widget.workout.category.icon}',
+                'assets/icons/${widget.workout.categoryId}',
                 height: 28,
                 width: 28,
               ),

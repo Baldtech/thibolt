@@ -1,5 +1,11 @@
+import 'dart:async';
+
+import 'package:after_layout/after_layout.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:thibolt/common_libs.dart';
+import 'package:thibolt/data/repositories/category_repository.dart';
+import 'package:thibolt/data/repositories/workout_repository.dart';
+import 'package:thibolt/data/sqlite_database.dart';
 import 'package:thibolt/models/category.dart';
 
 class AddPage extends StatefulWidget {
@@ -9,10 +15,36 @@ class AddPage extends StatefulWidget {
   State<AddPage> createState() => _AddPageState();
 }
 
-class _AddPageState extends State<AddPage> {
+class _AddPageState extends State<AddPage> with AfterLayoutMixin<AddPage> {
   final formKey = GlobalKey<FormState>();
-  String dropdownValue = Category.categories.first.name;
-  String workoutName = "";
+
+  late ICategoryRepository categoryRepository;
+  late IWorkoutRepository workoutRepository;
+
+  List<Category> categories = [];
+  late Workout workout = Workout(
+      name: "",
+      categoryId: -1,
+      duration: 100,
+      );
+
+  @override
+  FutureOr<void> afterFirstLayout(BuildContext context) async {
+    var db = await SQLiteDatabase().initializeDB();
+    categoryRepository = CategoryRepository(db: db);
+    workoutRepository = WorkoutRepository(db: db);
+
+    loadData();    
+  }
+
+  void loadData() async {
+    final cat = await categoryRepository.getCategories();
+    setState(() {
+      categories = cat;
+
+      workout.categoryId = categories.first.id;
+    });
+  }
 
   final List<WorkoutStep> steps = [
     WorkoutStep(name: 'Plank', duration: 60, restDuration: 15, order: 0),
@@ -24,7 +56,8 @@ class _AddPageState extends State<AddPage> {
         occurence: 2,
         children: [
           WorkoutStep(name: 'Sub 1', duration: 60, restDuration: 15, order: 0),
-          WorkoutStep(name: 'Sub 2 2', duration: 60, restDuration: 15, order: 1),
+          WorkoutStep(
+              name: 'Sub 2 2', duration: 60, restDuration: 15, order: 1),
         ]),
   ];
 
@@ -149,11 +182,11 @@ class _AddPageState extends State<AddPage> {
             children: [
               TextFormField(
                 style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                initialValue: workoutName,
+                initialValue: workout != null ? workout.name : "",
                 decoration: const InputDecoration(hintText: 'Workout name'),
                 onSaved: (val) {
                   setState(() {
-                    workoutName = val!;
+                    workout.name = val!;
                   });
                 },
                 validator: (value) {
@@ -164,7 +197,7 @@ class _AddPageState extends State<AddPage> {
                 },
               ),
               DropdownButton<String>(
-                value: dropdownValue,
+                value: categories.isNotEmpty ? workout.categoryId.toString() : null,
                 icon: const Icon(Icons.arrow_downward),
                 elevation: 16,
                 style: const TextStyle(color: Colors.deepPurple),
@@ -175,13 +208,13 @@ class _AddPageState extends State<AddPage> {
                 onChanged: (String? value) {
                   // This is called when the user selects an item.
                   setState(() {
-                    dropdownValue = value!;
+                    workout.categoryId = int.parse(value!);
                   });
                 },
-                items: Category.categories
+                items: categories
                     .map<DropdownMenuItem<String>>((Category value) {
                   return DropdownMenuItem<String>(
-                    value: value.name,
+                    value: value.id.toString(),
                     child: Text(value.name),
                   );
                 }).toList(),
@@ -230,11 +263,7 @@ class _AddPageState extends State<AddPage> {
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
                         formKey.currentState!.save();
-                        Workout.workouts.add(Workout(
-                            id: Workout.workouts.length,
-                            name: workoutName,
-                            category: Category.categories.firstWhere(
-                                (element) => element.name == dropdownValue)));
+                        workoutRepository.addWorkout(workout);
                         Navigator.pop(context);
                       }
                     },
