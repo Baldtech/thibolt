@@ -1,3 +1,4 @@
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:thibolt/common_libs.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -18,6 +19,7 @@ class DetailsPage extends StatefulWidget {
 class _DetailsPageState extends State<DetailsPage> {
   var _duration = 0;
   final CountDownController _controller = CountDownController();
+  PanelController _pc = new PanelController();
 
   List<StepModel> steps = [];
   List<StepModel> _nextSteps = [];
@@ -41,14 +43,50 @@ class _DetailsPageState extends State<DetailsPage> {
 
     return Scaffold(
       appBar: const NavBar(),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/background.png"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: _pageContent(context),
+      body: SlidingUpPanel(
+        minHeight: 50,
+        maxHeight: 200,
+        controller: _pc,
+        panelBuilder: () {
+          return Column(children: [
+            Container(
+              alignment: Alignment.center,
+              height: 50.0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (!_pc.isPanelOpen) {
+                        _pc.open();
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          'Next steps (${_nextSteps.length})',
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w300),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+              height: 0.5,
+              color: Colors.grey[300],
+            ),
+                        _nextStepsWidget(),
+          ]);
+        },
+        body: _pageContent(context),
       ),
     );
   }
@@ -70,7 +108,14 @@ class _DetailsPageState extends State<DetailsPage> {
               ],
             ),
           ),
-          Align(alignment: Alignment.bottomCenter, child: _nextStepsWidget())
+          Visibility(
+            visible: false,
+            replacement: const SizedBox.shrink(),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: _nextStepsWidget(hideTitle: true),
+            ),
+          )
         ],
       ),
     );
@@ -178,13 +223,12 @@ class _DetailsPageState extends State<DetailsPage> {
                 isTimerTextShown: true,
                 onComplete: () {
                   Future.delayed(Duration.zero, () async {
-                      widget._audioCache
-                          .play(AssetSource('audio/step-end.mp3'));
+                    widget._audioCache.play(AssetSource('audio/step-end.mp3'));
 
-                      setState(() {
-                        _currentSecond =  -1;
-                      });
+                    setState(() {
+                      _currentSecond = -1;
                     });
+                  });
                   if (!_isCurrentRest) {
                     if (steps[_currentStepIndex].restDuration > 0) {
                       setState(() {
@@ -304,16 +348,19 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
-  Column _nextStepsWidget() {
+  Column _nextStepsWidget({bool hideTitle = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 20),
-          child: Text(
-            '${'Next steps (${_nextSteps.length}'})',
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                color: Theme.of(context).colorScheme.primary, fontSize: 20),
+        Visibility(
+          visible: hideTitle,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: Text(
+              '${'Next steps (${_nextSteps.length}'})',
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary, fontSize: 20),
+            ),
           ),
         ),
         const SizedBox(height: 20),
