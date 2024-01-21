@@ -9,6 +9,7 @@ import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:thibolt/data/repositories/category_repository.dart';
 import 'package:thibolt/data/sqlite_database.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 // Details page
 class DetailsPage extends StatefulWidget {
@@ -312,17 +313,20 @@ class _DetailsPageState extends State<DetailsPage>
       controller.restart(duration: steps[_currentStepIndex].duration);
       setState(() {
         actionText = 'Pause';
+        WakelockPlus.enable();
       });
     } else {
       if (controller.isPaused) {
         controller.resume();
         setState(() {
           actionText = 'Pause';
+          WakelockPlus.enable();
         });
       } else {
         controller.pause();
         setState(() {
           actionText = 'Resume';
+          WakelockPlus.disable();
         });
       }
     }
