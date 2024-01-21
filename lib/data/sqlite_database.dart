@@ -1,19 +1,32 @@
+import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqlite_schema_upgrader/sqlite_schema_upgrader.dart';
 
-/// It manages sqlite database connection.
 class SQLiteDatabase {
-  static const int version = 2;
-
-  /// Initializes and returns sqlite database connection.
   Future<Database> initializeDB() async {
-    ///You must indicate what to do onCreate and what onUpdate
-    ///and our SQLiteSchema is the one who is in charge of that.
-    return openDatabase('workout_databasezz.db',
-        onCreate: (database, version) async {
-      SQLiteSchema().create(database, version);
-    }, onUpgrade: (db, oldVersion, newVersion) async {
-      SQLiteSchema().upgrade(db, oldVersion, newVersion);
-    }, version: version);
+    String path = await getDatabasesPath();
+    return openDatabase(
+      join(path, 'thibolt_database.db'),
+      onCreate: (database, version) async {
+        _initiateTables(database);
+        _initiateData(database);
+      },
+      version: 1,
+    );
+  }
+
+  void _initiateTables(Database database) {
+    database.execute(
+        "CREATE TABLE Categories(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, icon TEXT NOT NULL)");
+    database.execute(
+        "CREATE TABLE Workouts(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, categoryId INTEGER NOT NULL, duration INTEGER NOT NULL, stepJson TEXT NOT NULL, FOREIGN KEY(categoryId) REFERENCES Categories(id))");
+  }
+
+  void _initiateData(Database database) {
+    database.execute(
+        "INSERT INTO Categories(name, icon) VALUES ('swim', 'swim.svg')");
+    database.execute(
+        "INSERT INTO Categories(name, icon) VALUES ('stretching', 'stretching.svg')");
+    database.execute(
+        "INSERT INTO Categories(name, icon) VALUES ('core', 'core.svg')");
   }
 }

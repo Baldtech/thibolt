@@ -11,3 +11,4 @@ export 'package:thibolt/common/app_bar.dart';
 
 export 'package:thibolt/models/step.dart';
 export 'package:thibolt/models/workout.dart';
+export 'package:thibolt/models/category.dart';

@@ -1,27 +1,47 @@
 
+import 'dart:convert';
+
+import 'package:thibolt/common_libs.dart';
+
 class Workout {
   int id;
   String name;
   int categoryId;
   int duration;
+  String stepJson;
 
   Workout(
       {this.id = -1,
       required this.name,
       required this.categoryId,
-      this.duration = 100});
+      this.duration = 100,
+      this.stepJson = ''});
 
   Workout.fromMap(Map<String, dynamic> item)
       : id = item["id"],
         name = item["name"],
         categoryId = item["categoryId"],
-        duration = item["duration"];
+        duration = item["duration"],
+        stepJson = item["stepJson"];
 
   Map<String, Object> toMap() {
-    var map = {'name': name, 'categoryId': categoryId, 'duration': duration};
+    var map = {'name': name, 'categoryId': categoryId, 'duration': duration, 'stepJson': stepJson};
     if (id != -1) map['id'] = id;
 
     return map;
+  }
+
+  List<WorkoutStep> getSteps() {
+    List<WorkoutStep> steps = [];
+
+    if (stepJson.isNotEmpty) {
+      List<dynamic> json = jsonDecode(stepJson);
+      for (var element in json) {
+        steps.add(WorkoutStep.fromJson(element));
+      }
+    }
+
+    return steps;
   }
 
   static List<Workout> workouts = [
