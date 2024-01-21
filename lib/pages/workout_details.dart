@@ -25,7 +25,7 @@ class _DetailsPageState extends State<DetailsPage>
     with AfterLayoutMixin<DetailsPage> {
   final CountDownController controller = CountDownController();
   final PanelController pc = PanelController();
-  
+
   late ICategoryRepository categoryRepository;
 
   int duration = 0;
@@ -45,15 +45,28 @@ class _DetailsPageState extends State<DetailsPage>
     var db = await SQLiteDatabase().initializeDB();
     categoryRepository = CategoryRepository(db: db);
 
-    final Category catDb = await categoryRepository.getCategory(widget.workout.categoryId);
+    final Category catDb =
+        await categoryRepository.getCategory(widget.workout.categoryId);
 
     setState(() {
       category = catDb;
     });
 
-    steps = jsonDecode(widget.workout.stepJson)
+    final tempSteps = jsonDecode(widget.workout.stepJson)
         .map<WorkoutStep>((e) => WorkoutStep.fromJson(e))
         .toList();
+
+    for (WorkoutStep step in tempSteps) {
+      if (step.type == StepType.repeat) {
+        for (var i = 0; i < step.occurence; i++) {
+          for (WorkoutStep subStep in step.children!) {
+            steps.add(subStep);
+          }
+        }
+      } else {
+        steps.add(step);
+      }
+    }
     nextSteps = steps.sublist(_currentStepIndex + 1);
     duration = steps[0].duration;
     titleText = steps[_currentStepIndex].name;
