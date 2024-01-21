@@ -34,7 +34,6 @@ class _DetailsPageState extends State<DetailsPage>
   List<WorkoutStep> nextSteps = [];
   int _currentStepIndex = 0;
   String actionText = 'Start workout';
-  String titleText = "";
   bool isCurrentRest = false;
   String restDuration = "";
   int _currentSecond = -1;
@@ -70,7 +69,6 @@ class _DetailsPageState extends State<DetailsPage>
     }
     nextSteps = steps.sublist(_currentStepIndex + 1);
     duration = steps[0].duration;
-    titleText = steps[_currentStepIndex].name;
   }
 
   @override
@@ -230,7 +228,7 @@ class _DetailsPageState extends State<DetailsPage>
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: Text(
-            titleText,
+            steps.isNotEmpty ? steps[_currentStepIndex].name : "",
             style: Theme.of(context)
                 .textTheme
                 .displayLarge
