@@ -1,4 +1,4 @@
-import 'package:thibolt/common_libs.dart';
+import '../../config/common_libs.dart';
 
 class BaseCard extends StatelessWidget {
   final String title;
@@ -35,7 +35,7 @@ class BaseCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _left(context),
+          _buildLeftPart(context),
           const Expanded(child: SizedBox()),
           if (trailing != null)
             Container(
@@ -47,14 +47,13 @@ class BaseCard extends StatelessWidget {
     );
   }
 
-  Widget _left(BuildContext context) {
+  Widget _buildLeftPart(BuildContext context) {
     return Row(children: [
       Padding(
         padding: const EdgeInsets.all(15),
         child: icon,
       ),
       Column(
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 15),
@@ -69,8 +68,7 @@ class BaseCard extends StatelessWidget {
           Text(
             subTitle,
             style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                 ),
             overflow: TextOverflow.ellipsis,
           ),

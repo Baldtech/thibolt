@@ -1,4 +1,4 @@
-import 'package:thibolt/common_libs.dart';
+import '../../config/common_libs.dart';
 
 class NavBar extends StatelessWidget implements PreferredSizeWidget {
   const NavBar({super.key});
@@ -10,9 +10,7 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         children: [
           const SizedBox(width: 20),
-          const Text(
-            'Thibolt'
-          ),
+          const Text('Thibolt'),
           const SizedBox(width: 4),
           SvgPicture.asset(
             'assets/icons/app-icon.svg',
